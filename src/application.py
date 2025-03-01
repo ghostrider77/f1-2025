@@ -1,10 +1,23 @@
 import uvicorn
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from typing import AsyncGenerator
 
 from .configs.config import SERVICE_CONFIG
+from .database import db_engine
+from .database.entities import create_all_tables
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
+    create_all_tables(db_engine.engine())
+    yield
+
+    db_engine.close()
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
