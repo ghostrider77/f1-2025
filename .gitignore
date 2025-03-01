@@ -1,0 +1,13 @@
+*.html
+*.iml
+*.pyc
+*.toml
+
+*.egg-info/*
+
+!pyproject.toml
+
+.idea
+.vscode
+
+__pycache__
