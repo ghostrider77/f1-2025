@@ -5,8 +5,8 @@ from fastapi import FastAPI
 from typing import AsyncGenerator
 
 from .configs.config import SERVICE_CONFIG
-from .database import db_engine
 from .database.entities import create_all_tables
+from .game import db_engine
 
 
 @asynccontextmanager
