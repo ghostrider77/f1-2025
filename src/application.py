@@ -7,6 +7,7 @@ from typing import AsyncGenerator
 from .configs.config import SERVICE_CONFIG
 from .database.entities import create_all_tables
 from .game import db_engine
+from .web.user.router import router as user_router
 
 
 @asynccontextmanager
@@ -18,6 +19,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(user_router)
 
 
 @app.get("/")
