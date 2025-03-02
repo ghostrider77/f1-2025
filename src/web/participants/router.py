@@ -8,7 +8,7 @@ router = APIRouter(prefix="/api/v1/participants", tags=["actors"])
 
 
 @router.post("/create/constructor")
-def create_driver(name: str, db: DBDependency) -> RequestResponse:
+def create_constructor(name: str, db: DBDependency) -> RequestResponse:
     return db.create_constructor(name)
 
 
@@ -17,5 +17,6 @@ def create_driver(registration: DriverModel, db: DBDependency) -> RequestRespons
     return db.create_driver(registration)
 
 
+@router.post("/create/race")
 def create_race(registration: RaceModel, db: DBDependency) -> RequestResponse:
     return db.create_race(registration)
