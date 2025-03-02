@@ -5,10 +5,11 @@ from sqlalchemy.orm import Session
 from typing import Callable, Concatenate, ParamSpec, TypeVar
 
 from ..database.engine import DBEngine
-from ..database.entities import User
+from ..database.entities import Constructor, Driver, Race, User
 from ..utils.auth import hash_password
 from ..utils.enums import RequestStatus
 from ..web import RequestResponse
+from ..web.participants.models import DriverModel, RaceModel
 from ..web.user.models import UserModel
 
 P = ParamSpec("P")
@@ -28,6 +29,45 @@ class DBOperations:
                 return func(self, session, *args, **kwargs)
 
         return wrapper
+
+    @_with_engine
+    def create_constructor(self, session: Session, name: str) -> RequestResponse:
+        constructor_entry = Constructor(name=name)
+        try:
+            session.add(constructor_entry)
+            session.commit()
+            return RequestResponse(status=RequestStatus.SUCCESS)
+
+        except IntegrityError:
+            session.rollback()
+            error_msg = f"Could not create Constructor({name}), it is already created."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+    @_with_engine
+    def create_driver(self, session: Session, driver: DriverModel) -> RequestResponse:
+        driver_entry = Driver(**driver.model_dump())
+        try:
+            session.add(driver_entry)
+            session.commit()
+            return RequestResponse(status=RequestStatus.SUCCESS)
+
+        except IntegrityError:
+            session.rollback()
+            error_msg = f"Could not create Driver({driver.name}), it is already created."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+    @_with_engine
+    def create_race(self, session: Session, race: RaceModel) -> RequestResponse:
+        race_entry = Race(**race.model_dump())
+        try:
+            session.add(race_entry)
+            session.commit()
+            return RequestResponse(status=RequestStatus.SUCCESS)
+
+        except IntegrityError:
+            session.rollback()
+            error_msg = f"Could not create Race({race.name}), it is already created."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
 
     @_with_engine
     def create_user(self, session: Session, registration: UserModel) -> RequestResponse:
