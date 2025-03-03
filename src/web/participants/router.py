@@ -4,7 +4,7 @@ from .models import DriverModel, RaceModel
 from .. import RequestResponse
 from ...dependencies import DBDependency
 
-router = APIRouter(prefix="/api/v1/participants", tags=["actors"])
+router = APIRouter(prefix="/api/v1/participants", tags=["actors"], include_in_schema=False)
 
 
 @router.post("/create/constructor")
