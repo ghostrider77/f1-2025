@@ -37,7 +37,7 @@ class Constructor(Base):
 class Race(Base):
     __tablename__ = "race"
 
-    __table_args__ = (UniqueConstraint("name", "date", "race_format"),)
+    __table_args__ = (UniqueConstraint("name", "race_format"),)
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True, unique=True)
 
