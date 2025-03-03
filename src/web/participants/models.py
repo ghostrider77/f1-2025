@@ -7,7 +7,7 @@ from ...database.enums import RaceFormat
 
 class DriverModel(BaseModel):
     name: str = Field(max_length=128)
-    nationality: str = Field(max_length=64)
+    country: str = Field(max_length=64)
 
 
 class RaceModel(BaseModel):

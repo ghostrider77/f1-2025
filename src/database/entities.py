@@ -19,7 +19,7 @@ class Driver(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True, unique=True)
 
     name: Mapped[str] = mapped_column(String(128), unique=True)
-    nationality: Mapped[str] = mapped_column(String(64))
+    country: Mapped[str] = mapped_column(String(64))
 
     results: Mapped[list["Result"]] = relationship(back_populates="driver", cascade="all, delete-orphan")
 
