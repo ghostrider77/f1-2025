@@ -16,5 +16,6 @@ class RaceModel(BaseModel):
     name: str = Field(max_length=64)
     circuit_name: str = Field(max_length=64)
     circuit_location: str = Field(max_length=64)
+    country: str = Field(max_length=64)
     date: date
     race_format: RaceFormat

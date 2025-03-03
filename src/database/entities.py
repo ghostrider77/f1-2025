@@ -44,8 +44,9 @@ class Race(Base):
     name: Mapped[str] = mapped_column(String(64))
     circuit_name: Mapped[str] = mapped_column(String(64))
     circuit_location: Mapped[str] = mapped_column(String(64))
+    country: Mapped[str] = mapped_column(String(64))
     date: Mapped[date]
-    race_format: Mapped[RaceFormat] = mapped_column(Enum(native_enum=False, length=24))
+    race_format: Mapped[RaceFormat] = mapped_column(Enum(RaceFormat, native_enum=False, length=24))
 
     results: Mapped[list["Result"]] = relationship(back_populates="race", cascade="all, delete-orphan")
 
