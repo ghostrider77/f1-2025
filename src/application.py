@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from typing import AsyncGenerator
 
-from src.web.participants.models import DriverModel
+from src.web.participants.models import DriverModel, RaceModel
 from . import PACKAGE_DIR
 from .configs.config import SERVICE_CONFIG
 from .database.entities import create_all_tables
@@ -15,11 +15,15 @@ from .web.user.router import router as user_router
 
 
 def initialize_database() -> None:
-    for constructor in read_json_file(PACKAGE_DIR / "configs/data/constructors.json"):
+    folder = PACKAGE_DIR / "configs" / "data"
+    for constructor in read_json_file(folder / "constructors.json"):
         db_ops.create_constructor(constructor)
 
-    for line in read_json_file(PACKAGE_DIR / "configs/data/drivers.json"):
+    for line in read_json_file(folder / "drivers.json"):
         db_ops.create_driver(DriverModel.model_validate(line))
+
+    for line in read_json_file(folder / "races.json"):
+        db_ops.create_race(RaceModel.model_validate(line))
 
 
 @asynccontextmanager

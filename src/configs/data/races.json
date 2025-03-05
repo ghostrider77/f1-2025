@@ -1,0 +1,71 @@
+[
+  {
+    "name": "World Championship",
+    "date": "2025-03-16",
+    "race_format": "WORLD_CHAMPIONSHIP"
+  },
+  {
+    "name": "Australian Grand Prix",
+    "circuit_name": "Albert Park Circuit",
+    "circuit_location": "Melbourne",
+    "country": "Australia",
+    "date": "2025-03-16",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Chinese Grand Prix",
+    "circuit_name": "Shanghai International Circuit",
+    "circuit_location": "Shanghai",
+    "country": "China",
+    "date": "2025-03-22",
+    "race_format": "SPRINT_RACE"
+  },
+  {
+    "name": "Chinese Grand Prix",
+    "circuit_name": "Shanghai International Circuit",
+    "circuit_location": "Shanghai",
+    "country": "China",
+    "date": "2025-03-23",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Japanese Grand Prix",
+    "circuit_name": "Suzuka International Racing Course",
+    "circuit_location": "Suzuka",
+    "country": "Japan",
+    "date": "2025-04-06",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Bahrain Grand Prix",
+    "circuit_name": "Bahrain International Circuit",
+    "circuit_location": "Sakhir",
+    "country": "Bahrain",
+    "date": "2025-04-13",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Saudi Arabian Grand Prix",
+    "circuit_name": "Jeddah Corniche Circuit",
+    "circuit_location": "Jeddah",
+    "country": "Saudi Arabia",
+    "date": "2025-04-20",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Miami Grand Prix",
+    "circuit_name": "Miami International Autodrome",
+    "circuit_location": "Miami Gardens",
+    "country": "USA",
+    "date": "2025-05-03",
+    "race_format": "SPRINT_RACE"
+  },
+  {
+    "name": "Miami Grand Prix",
+    "circuit_name": "Miami International Autodrome",
+    "circuit_location": "Miami Gardens",
+    "country": "USA",
+    "date": "2025-05-04",
+    "race_format": "GRAND_PRIX"
+  }
+]
