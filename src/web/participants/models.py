@@ -14,8 +14,8 @@ class RaceModel(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     name: str = Field(max_length=64)
-    circuit_name: str = Field(max_length=64)
-    circuit_location: str = Field(max_length=64)
-    country: str = Field(max_length=64)
+    circuit_name: str | None = Field(None, max_length=64)
+    circuit_location: str | None = Field(None, max_length=64)
+    country: str | None = Field(None, max_length=64)
     date: date
     race_format: RaceFormat

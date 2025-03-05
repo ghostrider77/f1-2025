@@ -42,9 +42,9 @@ class Race(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True, unique=True)
 
     name: Mapped[str] = mapped_column(String(64))
-    circuit_name: Mapped[str] = mapped_column(String(64))
-    circuit_location: Mapped[str] = mapped_column(String(64))
-    country: Mapped[str] = mapped_column(String(64))
+    circuit_name: Mapped[str | None] = mapped_column(String(64))
+    circuit_location: Mapped[str | None] = mapped_column(String(64))
+    country: Mapped[str | None] = mapped_column(String(64))
     date: Mapped[date]
     race_format: Mapped[RaceFormat] = mapped_column(Enum(RaceFormat, native_enum=False, length=24))
 
