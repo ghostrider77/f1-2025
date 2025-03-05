@@ -1,16 +1,17 @@
 import functools as ft
 
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing import Callable, Concatenate, ParamSpec, TypeVar
 
 from ..database.engine import DBEngine
 from ..database.entities import Constructor, Driver, Race, User
-from ..utils.auth import hash_password
+from ..utils.auth import hash_password, is_password_valid
 from ..utils.enums import RequestStatus
 from ..web import RequestResponse
 from ..web.participants.models import DriverModel, RaceModel
-from ..web.user.models import UserModel
+from ..web.user.models import UserModel, UserPasswordChangeModel
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -85,3 +86,33 @@ class DBOperations:
             session.rollback()
             error_msg = f"Could not create User({registration.username}), it is already registered."
             return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+    @_with_engine
+    def change_user_password(self, session: Session, update_request: UserPasswordChangeModel) -> RequestResponse:
+        if (user_entity := self._retrieve_user(update_request.username)) is None:
+            error_msg = f"Cannot change password. User(username={update_request.username}) is not found."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+        if not is_password_valid(update_request.current_password, stored_password=user_entity.password):
+            error_msg = f"Failed to authenticate User(username={update_request.username}). Password cannot be changed."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+        if (hashed_password := hash_password(update_request.new_password)) is None:
+            error_msg = "Password should be an ASCII-string with length between 8 and 256."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+        session.add(user_entity)
+        user_entity.password = hashed_password
+        session.commit()
+        return RequestResponse(status=RequestStatus.SUCCESS)
+
+    def authenticate(self, username: str, password: str) -> bool:
+        if (user_entity := self._retrieve_user(username)) is None:
+            return False
+
+        return is_password_valid(password, stored_password=user_entity.password)
+
+    @_with_engine
+    def _retrieve_user(self, session: Session, username: str) -> User | None:
+        query = select(User).where(User.username == username)
+        return session.execute(query).scalars().first()
