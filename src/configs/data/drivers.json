@@ -1,0 +1,22 @@
+[
+  {"name": "Jack Doohan", "country": "Australia"},
+  {"name": "Pierre Gasly", "country": "France"},
+  {"name": "Fernando Alonso", "country": "Spain"},
+  {"name": "Lance Stroll", "country": "Canada"},
+  {"name": "Charles Leclerc", "country": "Monaco"},
+  {"name": "Lewis Hamilton", "country": "United Kingdom"},
+  {"name": "Esteban Ocon", "country": "France"},
+  {"name": "Oliver Bearman", "country": "United Kingdom"},
+  {"name": "Lando Norris", "country": "United Kingdom"},
+  {"name": "Oscar Piastri", "country": "Australia"},
+  {"name": "Andrea Kimi Antonelli", "country": "Italy"},
+  {"name": "George Russell", "country": "United Kingdom"},
+  {"name": "Isack Hadjar", "country": "France"},
+  {"name": "Yuki Tsunoda", "country": "Japan"},
+  {"name": "Max Verstappen", "country": "Netherlands"},
+  {"name": "Liam Lawson", "country": "New Zealand"},
+  {"name": "Gabriel Bortoleto", "country": "Brazil"},
+  {"name": "Nicko Hülkenberg", "country": "Germany"},
+  {"name": "Alexander Albon", "country": "Thailand"},
+  {"name": "Carlos Sainz Jr.", "country": "Spain"}
+]

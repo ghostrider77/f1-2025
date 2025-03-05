@@ -19,7 +19,7 @@ class Driver(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True, unique=True)
 
     name: Mapped[str] = mapped_column(String(128), unique=True)
-    nationality: Mapped[str] = mapped_column(String(64))
+    country: Mapped[str] = mapped_column(String(64))
 
     results: Mapped[list["Result"]] = relationship(back_populates="driver", cascade="all, delete-orphan")
 
@@ -37,15 +37,16 @@ class Constructor(Base):
 class Race(Base):
     __tablename__ = "race"
 
-    __table_args__ = (UniqueConstraint("name", "date", "race_format"),)
+    __table_args__ = (UniqueConstraint("name", "race_format"),)
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True, unique=True)
 
     name: Mapped[str] = mapped_column(String(64))
-    circuit_name: Mapped[str] = mapped_column(String(64))
-    circuit_location: Mapped[str] = mapped_column(String(64))
+    circuit_name: Mapped[str | None] = mapped_column(String(64))
+    circuit_location: Mapped[str | None] = mapped_column(String(64))
+    country: Mapped[str | None] = mapped_column(String(64))
     date: Mapped[date]
-    race_format: Mapped[RaceFormat] = mapped_column(Enum(native_enum=False, length=24))
+    race_format: Mapped[RaceFormat] = mapped_column(Enum(RaceFormat, native_enum=False, length=24))
 
     results: Mapped[list["Result"]] = relationship(back_populates="race", cascade="all, delete-orphan")
 
