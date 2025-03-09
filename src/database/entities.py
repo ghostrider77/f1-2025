@@ -81,7 +81,6 @@ class User(Base):
     password: Mapped[bytes]
 
     predictions: Mapped[list["Prediction"]] = relationship(back_populates="user", cascade="all, delete-orphan")
-    scores: Mapped[list["Score"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
 
 class Prediction(Base):
@@ -98,17 +97,3 @@ class Prediction(Base):
     position: Mapped[int]
 
     user: Mapped["User"] = relationship(back_populates="predictions")
-
-
-class Score(Base):
-    __tablename__ = "score"
-
-    __table_args__ = (UniqueConstraint("user_id", "race_id"),)
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True, unique=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", onupdate="CASCADE", ondelete="CASCADE"))
-    race_id: Mapped[int] = mapped_column(ForeignKey("race.id", onupdate="CASCADE", ondelete="CASCADE"))
-
-    score: Mapped[float | None]
-
-    user: Mapped["User"] = relationship(back_populates="scores")
