@@ -1,16 +1,18 @@
 import functools as ft
 
+from datetime import UTC, datetime
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing import Callable, Concatenate, ParamSpec, TypeVar
 
 from ..database.engine import DBEngine
-from ..database.entities import Constructor, Driver, Race, User
+from ..database.enums import RaceFormat
+from ..database.entities import Constructor, Driver, Prediction, Race, User
 from ..utils.auth import hash_password, is_password_valid
 from ..utils.enums import RequestStatus
 from ..web import RequestResponse
-from ..web.participants.models import DriverModel, RaceModel
+from ..web.participants.models import DriverModel, PredictionModel, RaceModel
 from ..web.user.models import UserModel, UserPasswordChangeModel
 
 P = ParamSpec("P")
@@ -106,6 +108,47 @@ class DBOperations:
         session.commit()
         return RequestResponse(status=RequestStatus.SUCCESS)
 
+    @_with_engine
+    def make_prediction(self, session: Session, prediction: PredictionModel) -> RequestResponse:
+        if (user_entity := self._retrieve_user(prediction.username)) is None:
+            error_msg = f"User(username={prediction.username}) is not found."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+        if not is_password_valid(prediction.password, stored_password=user_entity.password):
+            error_msg = f"Failed to authenticate User(username={prediction.username})."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+        if (race_entity := self._retrieve_race(prediction.race_name, prediction.race_format)) is None:
+            error_msg = f"Race(name={prediction.race_name}, format={prediction.race_format}) is not found."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+        prediction_time = datetime.now(tz=UTC)
+        if prediction_time.date() > race_entity.prediction_deadline:
+            error_msg = f"Prediction deadline {race_entity.prediction_deadline} is already passed."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+        prediction_entities = []
+        for ix, driver_name in enumerate(prediction.drivers, start=1):
+            if (driver := self._retrieve_driver(driver_name)) is None:
+                error_msg = f"Unknown driver {driver_name}."
+                return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+            entity = Prediction(
+                race_id=race_entity.id, driver_id=driver.id, position=ix, prediction_time_utc=prediction_time
+            )
+            prediction_entities.append(entity)
+
+        try:
+            session.add(user_entity)
+            user_entity.predictions.extend(prediction_entities)
+            session.commit()
+            return RequestResponse(status=RequestStatus.SUCCESS)
+
+        except IntegrityError:
+            session.rollback()
+            error_msg = "Failed to add predictions, maybe already predicted this race."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
     def authenticate(self, username: str, password: str) -> bool:
         if (user_entity := self._retrieve_user(username)) is None:
             return False
@@ -125,6 +168,16 @@ class DBOperations:
         result = session.execute(query).scalars().all()
 
         return list(map(DriverModel.model_validate, result))
+
+    @_with_engine
+    def _retrieve_driver(self, session: Session, name: str) -> Driver | None:
+        query = select(Driver).where(Driver.name == name)
+        return session.execute(query).scalars().first()
+
+    @_with_engine
+    def _retrieve_race(self, session: Session, race_name: str, race_format: RaceFormat) -> Race | None:
+        query = select(Race).where(Race.name == race_name, Race.race_format == race_format)
+        return session.execute(query).scalars().first()
 
     @_with_engine
     def _retrieve_user(self, session: Session, username: str) -> User | None:

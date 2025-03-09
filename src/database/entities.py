@@ -1,5 +1,6 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from sqlalchemy import Engine, Enum, ForeignKey, String, UniqueConstraint
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from .enums import RaceFormat
@@ -49,6 +50,10 @@ class Race(Base):
     race_format: Mapped[RaceFormat] = mapped_column(Enum(RaceFormat, native_enum=False, length=24))
 
     results: Mapped[list["Result"]] = relationship(back_populates="race", cascade="all, delete-orphan")
+
+    @hybrid_property
+    def prediction_deadline(self) -> date:
+        return self.date - timedelta(days=2)
 
 
 class Result(Base):
