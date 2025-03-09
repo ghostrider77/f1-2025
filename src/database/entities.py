@@ -46,14 +46,14 @@ class Race(Base):
     circuit_name: Mapped[str | None] = mapped_column(String(64))
     circuit_location: Mapped[str | None] = mapped_column(String(64))
     country: Mapped[str | None] = mapped_column(String(64))
-    date: Mapped[date]
+    race_date: Mapped[date]
     race_format: Mapped[RaceFormat] = mapped_column(Enum(RaceFormat, native_enum=False, length=24))
 
     results: Mapped[list["Result"]] = relationship(back_populates="race", cascade="all, delete-orphan")
 
     @hybrid_property
     def prediction_deadline(self) -> date:
-        return self.date - timedelta(days=2)
+        return self.race_date - timedelta(days=2)
 
 
 class Result(Base):

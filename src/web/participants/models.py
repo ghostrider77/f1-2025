@@ -39,5 +39,5 @@ class RaceModel(BaseModel):
     circuit_name: str | None = Field(None, max_length=64)
     circuit_location: str | None = Field(None, max_length=64)
     country: str | None = Field(None, max_length=64)
-    date: date
+    race_date: date = Field(alias="date")
     race_format: RaceFormat

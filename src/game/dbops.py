@@ -157,7 +157,7 @@ class DBOperations:
 
     @_with_engine
     def get_races(self, session: Session) -> list[RaceModel]:
-        query = select(Race).order_by(Race.date)
+        query = select(Race).order_by(Race.race_date)
         result = session.execute(query).scalars().all()
 
         return list(map(RaceModel.model_validate, result))
