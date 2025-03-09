@@ -1,5 +1,6 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from sqlalchemy import Engine, Enum, ForeignKey, String, UniqueConstraint
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from .enums import RaceFormat
@@ -45,10 +46,14 @@ class Race(Base):
     circuit_name: Mapped[str | None] = mapped_column(String(64))
     circuit_location: Mapped[str | None] = mapped_column(String(64))
     country: Mapped[str | None] = mapped_column(String(64))
-    date: Mapped[date]
+    race_date: Mapped[date]
     race_format: Mapped[RaceFormat] = mapped_column(Enum(RaceFormat, native_enum=False, length=24))
 
     results: Mapped[list["Result"]] = relationship(back_populates="race", cascade="all, delete-orphan")
+
+    @hybrid_property
+    def prediction_deadline(self) -> date:
+        return self.race_date - timedelta(days=2)
 
 
 class Result(Base):
@@ -61,7 +66,7 @@ class Result(Base):
     race_id: Mapped[int] = mapped_column(ForeignKey("race.id"), primary_key=True)
 
     position: Mapped[int]
-    point: Mapped[int]
+    points: Mapped[float]
 
     driver: Mapped["Driver"] = relationship(back_populates="results")
     constructor: Mapped["Constructor"] = relationship(back_populates="results")
@@ -76,7 +81,6 @@ class User(Base):
     password: Mapped[bytes]
 
     predictions: Mapped[list["Prediction"]] = relationship(back_populates="user", cascade="all, delete-orphan")
-    scores: Mapped[list["Score"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
 
 class Prediction(Base):
@@ -93,17 +97,3 @@ class Prediction(Base):
     position: Mapped[int]
 
     user: Mapped["User"] = relationship(back_populates="predictions")
-
-
-class Score(Base):
-    __tablename__ = "score"
-
-    __table_args__ = (UniqueConstraint("user_id", "race_id"),)
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True, unique=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", onupdate="CASCADE", ondelete="CASCADE"))
-    race_id: Mapped[int] = mapped_column(ForeignKey("race.id", onupdate="CASCADE", ondelete="CASCADE"))
-
-    score: Mapped[float | None]
-
-    user: Mapped["User"] = relationship(back_populates="scores")
