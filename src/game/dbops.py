@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from typing import Callable, Concatenate, ParamSpec, TypeVar
+from typing import Callable, Concatenate, Iterable, ParamSpec, TypeVar
 
 from .distance import calc_distance
 from ..database.engine import DBEngine
@@ -189,6 +189,30 @@ class DBOperations:
         point_scoring_drivers = self._retrieve_point_scorers(request.race_name, request.race_format)
         return calc_distance(predicted_drivers, point_scoring_drivers)
 
+    def calc_total_score(self, username: str) -> float | None:
+        races = self.get_races()
+
+        scores = []
+        for race in races:
+            score_request = ScoreModel(username=username, race_name=race.name, race_format=race.race_format)
+            if (score := self.calc_score(score_request)) is not None:
+                scores.append(score)
+
+        if not scores:
+            return None
+
+        return sum(scores)
+
+    def get_standings(self) -> list[tuple[str, float]]:
+        users = self._retrieve_users()
+
+        scores = []
+        for user in users:
+            if (score := self.calc_total_score(user.username)) is not None:
+                scores.append((user.username, score))
+
+        return sorted(scores, key=lambda x: x[1])
+
     @_with_engine
     def get_races(self, session: Session) -> list[RaceModel]:
         query = select(Race).order_by(Race.race_date)
@@ -253,3 +277,7 @@ class DBOperations:
     def _retrieve_user(self, session: Session, username: str) -> User | None:
         query = select(User).where(User.username == username)
         return session.execute(query).scalars().first()
+
+    @_with_engine
+    def _retrieve_users(self, session: Session) -> list[User]:
+        return list(session.execute(select(User)).scalars().all())

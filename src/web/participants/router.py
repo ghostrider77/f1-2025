@@ -42,6 +42,16 @@ def calc_score(request: ScoreModel, db: DBDependency) -> float | None:
     return db.calc_score(request)
 
 
+@router.get("/get/totalscore/{username}")
+def calc_total_score(username: str, db: DBDependency) -> float | None:
+    return db.calc_total_score(username)
+
+
+@router.get("/get/standings")
+def get_standings(db: DBDependency) -> list[tuple[str, float]]:
+    return db.get_standings()
+
+
 @router.post("/make/prediction", response_model_exclude_none=True)
 def make_prediction(prediction: PredictionModel, db: DBDependency) -> RequestResponse:
     return db.make_prediction(prediction)
