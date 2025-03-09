@@ -6,13 +6,14 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing import Callable, Concatenate, ParamSpec, TypeVar
 
+from .distance import calc_distance
 from ..database.engine import DBEngine
 from ..database.enums import RaceFormat
 from ..database.entities import Constructor, Driver, Prediction, Race, Result, User
 from ..utils.auth import hash_password, is_password_valid
 from ..utils.enums import RequestStatus
 from ..web import RequestResponse
-from ..web.participants.models import DriverModel, PredictionModel, RaceModel, ResultModel
+from ..web.participants.models import DriverModel, PredictionModel, RaceModel, ResultModel, ScoreModel
 from ..web.user.models import UserModel, UserPasswordChangeModel
 
 P = ParamSpec("P")
@@ -180,6 +181,14 @@ class DBOperations:
             error_msg = "Failed to add result to race."
             return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
 
+    def calc_score(self, request: ScoreModel) -> float | None:
+        if self._retrieve_race(request.race_name, request.race_format) is None:
+            return None
+
+        predicted_drivers = self._retrieve_predicted_drivers(request.username, request.race_name, request.race_format)
+        point_scoring_drivers = self._retrieve_point_scorers(request.race_name, request.race_format)
+        return calc_distance(predicted_drivers, point_scoring_drivers)
+
     @_with_engine
     def get_races(self, session: Session) -> list[RaceModel]:
         query = select(Race).order_by(Race.race_date)
@@ -208,6 +217,37 @@ class DBOperations:
     def _retrieve_race(self, session: Session, race_name: str, race_format: RaceFormat) -> Race | None:
         query = select(Race).where(Race.name == race_name, Race.race_format == race_format)
         return session.execute(query).scalars().first()
+
+    @_with_engine
+    def _retrieve_predicted_drivers(
+        self,
+        session: Session,
+        username: str,
+        race_name: str,
+        race_format: RaceFormat,
+    ) -> list[str]:
+        query = (select(Driver.name)
+                 .join(Prediction)
+                 .join(User)
+                 .join(Race)
+                 .where(User.username == username,
+                        Race.name == race_name,
+                        Race.race_format == race_format)
+                 .order_by(Prediction.position))  # fmt: skip
+
+        return list(session.execute(query).scalars().all())
+
+    @_with_engine
+    def _retrieve_point_scorers(self, session: Session, race_name: str, race_format: RaceFormat) -> list[str]:
+        query = (select(Driver.name)
+                 .join(Result)
+                 .join(Race)
+                 .where(Race.name == race_name,
+                        Race.race_format == race_format,
+                        Result.points > 0.0)
+                 .order_by(Result.position))  # fmt: skip
+
+        return list(session.execute(query).scalars().all())
 
     @_with_engine
     def _retrieve_user(self, session: Session, username: str) -> User | None:
