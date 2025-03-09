@@ -113,6 +113,20 @@ class DBOperations:
         return is_password_valid(password, stored_password=user_entity.password)
 
     @_with_engine
+    def get_races(self, session: Session) -> list[RaceModel]:
+        query = select(Race).order_by(Race.date)
+        result = session.execute(query).scalars().all()
+
+        return list(map(RaceModel.model_validate, result))
+
+    @_with_engine
+    def get_drivers(self, session: Session) -> list[DriverModel]:
+        query = select(Driver).order_by(Driver.id)
+        result = session.execute(query).scalars().all()
+
+        return list(map(DriverModel.model_validate, result))
+
+    @_with_engine
     def _retrieve_user(self, session: Session, username: str) -> User | None:
         query = select(User).where(User.username == username)
         return session.execute(query).scalars().first()
