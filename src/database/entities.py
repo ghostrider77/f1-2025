@@ -66,7 +66,7 @@ class Result(Base):
     race_id: Mapped[int] = mapped_column(ForeignKey("race.id"), primary_key=True)
 
     position: Mapped[int]
-    point: Mapped[int]
+    points: Mapped[float]
 
     driver: Mapped["Driver"] = relationship(back_populates="results")
     constructor: Mapped["Constructor"] = relationship(back_populates="results")

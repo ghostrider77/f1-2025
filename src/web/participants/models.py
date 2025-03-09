@@ -41,3 +41,14 @@ class RaceModel(BaseModel):
     country: str | None = Field(None, max_length=64)
     race_date: date = Field(alias="date")
     race_format: RaceFormat
+
+
+class ResultModel(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    race_name: str
+    race_format: RaceFormat
+    driver: str
+    constructor: str
+    position: int = Field(ge=1)
+    points: float = Field(0.0, ge=0.0)

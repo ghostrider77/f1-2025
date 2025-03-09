@@ -8,11 +8,11 @@ from typing import Callable, Concatenate, ParamSpec, TypeVar
 
 from ..database.engine import DBEngine
 from ..database.enums import RaceFormat
-from ..database.entities import Constructor, Driver, Prediction, Race, User
+from ..database.entities import Constructor, Driver, Prediction, Race, Result, User
 from ..utils.auth import hash_password, is_password_valid
 from ..utils.enums import RequestStatus
 from ..web import RequestResponse
-from ..web.participants.models import DriverModel, PredictionModel, RaceModel
+from ..web.participants.models import DriverModel, PredictionModel, RaceModel, ResultModel
 from ..web.user.models import UserModel, UserPasswordChangeModel
 
 P = ParamSpec("P")
@@ -149,11 +149,36 @@ class DBOperations:
             error_msg = "Failed to add predictions, maybe already predicted this race."
             return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
 
-    def authenticate(self, username: str, password: str) -> bool:
-        if (user_entity := self._retrieve_user(username)) is None:
-            return False
+    @_with_engine
+    def add_result(self, session: Session, result: ResultModel) -> RequestResponse:
+        if (race_entity := self._retrieve_race(result.race_name, result.race_format)) is None:
+            error_msg = f"Race(name={result.race_name}, format={result.race_format}) is not found."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
 
-        return is_password_valid(password, stored_password=user_entity.password)
+        if (driver_entity := self._retrieve_driver(result.driver)) is None:
+            error_msg = f"Driver(name={result.driver}) is not found."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+        if (constructor_entity := self._retrieve_constructor(result.constructor)) is None:
+            error_msg = f"Constructor(name={result.driver}) is not found."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+        race_result = Result(
+            driver_id=driver_entity.id,
+            constructor_id=constructor_entity.id,
+            position=result.position,
+            points=result.points,
+        )
+        try:
+            session.add(race_entity)
+            race_entity.results.append(race_result)
+            session.commit()
+            return RequestResponse(status=RequestStatus.SUCCESS)
+
+        except IntegrityError:
+            session.rollback()
+            error_msg = "Failed to add result to race."
+            return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
 
     @_with_engine
     def get_races(self, session: Session) -> list[RaceModel]:
@@ -168,6 +193,11 @@ class DBOperations:
         result = session.execute(query).scalars().all()
 
         return list(map(DriverModel.model_validate, result))
+
+    @_with_engine
+    def _retrieve_constructor(self, session: Session, name: str) -> Constructor | None:
+        query = select(Constructor).where(Constructor.name == name)
+        return session.execute(query).scalars().first()
 
     @_with_engine
     def _retrieve_driver(self, session: Session, name: str) -> Driver | None:

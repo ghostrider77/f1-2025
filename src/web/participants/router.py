@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from .models import DriverModel, PredictionModel, RaceModel
+from .models import DriverModel, PredictionModel, RaceModel, ResultModel
 from .. import RequestResponse
 from ...dependencies import DBDependency
 
@@ -20,6 +20,11 @@ def create_driver(registration: DriverModel, db: DBDependency) -> RequestRespons
 @router.post("/create/race", include_in_schema=False)
 def create_race(registration: RaceModel, db: DBDependency) -> RequestResponse:
     return db.create_race(registration)
+
+
+@router.post("/add/result", include_in_schema=False)
+def add_result(result: ResultModel, db: DBDependency) -> RequestResponse:
+    return db.add_result(result)
 
 
 @router.get("/get/races")
