@@ -12,6 +12,13 @@ class DriverModel(BaseModel):
     country: str = Field(max_length=64)
 
 
+class PredictionInfoModel(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    race_name: str
+    race_format: RaceFormat
+
+
 class PredictionModel(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 

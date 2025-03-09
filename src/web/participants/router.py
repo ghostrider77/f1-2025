@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from .models import DriverModel, PredictionModel, RaceModel, ResultModel, ScoreModel
+from .models import DriverModel, PredictionInfoModel, PredictionModel, RaceModel, ResultModel, ScoreModel
 from .. import RequestResponse
 from ...dependencies import DBDependency
 
@@ -35,6 +35,11 @@ def get_races(db: DBDependency) -> list[RaceModel]:
 @router.get("/get/drivers")
 def get_drivers(db: DBDependency) -> list[DriverModel]:
     return db.get_drivers()
+
+
+@router.post("/get/prediction")
+def get_race_predictions(request: PredictionInfoModel, db: DBDependency) -> dict[str, list[str]]:
+    return db.get_race_predictions(request.race_name, request.race_format)
 
 
 @router.post("/get/score")

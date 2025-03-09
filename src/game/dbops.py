@@ -1,10 +1,11 @@
 import functools as ft
 
+from collections import defaultdict
 from datetime import UTC, datetime
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from typing import Callable, Concatenate, Iterable, ParamSpec, TypeVar
+from typing import Callable, Concatenate, ParamSpec, TypeVar
 
 from .distance import calc_distance
 from ..database.engine import DBEngine
@@ -213,6 +214,9 @@ class DBOperations:
 
         return sorted(scores, key=lambda x: x[1])
 
+    def get_race_predictions(self, race_name: str, race_format: RaceFormat) -> dict[str, list[str]]:
+        return self._retrieve_predictions(race_name, race_format)
+
     @_with_engine
     def get_races(self, session: Session) -> list[RaceModel]:
         query = select(Race).order_by(Race.race_date)
@@ -272,6 +276,23 @@ class DBOperations:
                  .order_by(Result.position))  # fmt: skip
 
         return list(session.execute(query).scalars().all())
+
+    @_with_engine
+    def _retrieve_predictions(self, session: Session, race_name: str, race_format: RaceFormat) -> dict[str, list[str]]:
+        query = (select(User.username, Driver.name)
+                 .join(Prediction, Prediction.user_id == User.id)
+                 .join(Driver)
+                 .join(Race)
+                 .where(Race.name == race_name,
+                        Race.race_format == race_format)
+                 .order_by(User.username, Prediction.position))  # fmt: skip
+
+        result_rows = session.execute(query).all()
+        result = defaultdict(list)
+        for row in result_rows:
+            result[row.username].append(row.name)
+
+        return dict(result)
 
     @_with_engine
     def _retrieve_user(self, session: Session, username: str) -> User | None:
