@@ -12,6 +12,13 @@ class DriverModel(BaseModel):
     country: str = Field(max_length=64)
 
 
+class PredictionInfoModel(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    race_name: str
+    race_format: RaceFormat
+
+
 class PredictionModel(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
@@ -52,3 +59,11 @@ class ResultModel(BaseModel):
     constructor: str
     position: int = Field(ge=1)
     points: float = Field(0.0, ge=0.0)
+
+
+class ScoreModel(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    username: str
+    race_name: str
+    race_format: RaceFormat

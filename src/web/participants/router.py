@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from .models import DriverModel, PredictionModel, RaceModel, ResultModel
+from .models import DriverModel, PredictionInfoModel, PredictionModel, RaceModel, ResultModel, ScoreModel
 from .. import RequestResponse
 from ...dependencies import DBDependency
 
@@ -22,7 +22,7 @@ def create_race(registration: RaceModel, db: DBDependency) -> RequestResponse:
     return db.create_race(registration)
 
 
-@router.post("/add/result", include_in_schema=False)
+@router.post("/add/result", include_in_schema=False, response_model_exclude_none=True)
 def add_result(result: ResultModel, db: DBDependency) -> RequestResponse:
     return db.add_result(result)
 
@@ -35,6 +35,26 @@ def get_races(db: DBDependency) -> list[RaceModel]:
 @router.get("/get/drivers")
 def get_drivers(db: DBDependency) -> list[DriverModel]:
     return db.get_drivers()
+
+
+@router.post("/get/prediction")
+def get_race_predictions(request: PredictionInfoModel, db: DBDependency) -> dict[str, list[str]]:
+    return db.get_race_predictions(request.race_name, request.race_format)
+
+
+@router.post("/get/score")
+def calc_score(request: ScoreModel, db: DBDependency) -> float | None:
+    return db.calc_score(request)
+
+
+@router.get("/get/totalscore/{username}")
+def calc_total_score(username: str, db: DBDependency) -> float | None:
+    return db.calc_total_score(username)
+
+
+@router.get("/get/standings")
+def get_standings(db: DBDependency) -> list[tuple[str, float]]:
+    return db.get_standings()
 
 
 @router.post("/make/prediction", response_model_exclude_none=True)

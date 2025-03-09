@@ -1,18 +1,20 @@
 import functools as ft
 
+from collections import defaultdict
 from datetime import UTC, datetime
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing import Callable, Concatenate, ParamSpec, TypeVar
 
+from .distance import calc_distance
 from ..database.engine import DBEngine
 from ..database.enums import RaceFormat
 from ..database.entities import Constructor, Driver, Prediction, Race, Result, User
 from ..utils.auth import hash_password, is_password_valid
 from ..utils.enums import RequestStatus
 from ..web import RequestResponse
-from ..web.participants.models import DriverModel, PredictionModel, RaceModel, ResultModel
+from ..web.participants.models import DriverModel, PredictionModel, RaceModel, ResultModel, ScoreModel
 from ..web.user.models import UserModel, UserPasswordChangeModel
 
 P = ParamSpec("P")
@@ -180,6 +182,41 @@ class DBOperations:
             error_msg = "Failed to add result to race."
             return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
 
+    def calc_score(self, request: ScoreModel) -> float | None:
+        if self._retrieve_race(request.race_name, request.race_format) is None:
+            return None
+
+        predicted_drivers = self._retrieve_predicted_drivers(request.username, request.race_name, request.race_format)
+        point_scoring_drivers = self._retrieve_point_scorers(request.race_name, request.race_format)
+        return calc_distance(predicted_drivers, point_scoring_drivers)
+
+    def calc_total_score(self, username: str) -> float | None:
+        races = self.get_races()
+
+        scores = []
+        for race in races:
+            score_request = ScoreModel(username=username, race_name=race.name, race_format=race.race_format)
+            if (score := self.calc_score(score_request)) is not None:
+                scores.append(score)
+
+        if not scores:
+            return None
+
+        return sum(scores)
+
+    def get_standings(self) -> list[tuple[str, float]]:
+        users = self._retrieve_users()
+
+        scores = []
+        for user in users:
+            if (score := self.calc_total_score(user.username)) is not None:
+                scores.append((user.username, score))
+
+        return sorted(scores, key=lambda x: x[1])
+
+    def get_race_predictions(self, race_name: str, race_format: RaceFormat) -> dict[str, list[str]]:
+        return self._retrieve_predictions(race_name, race_format)
+
     @_with_engine
     def get_races(self, session: Session) -> list[RaceModel]:
         query = select(Race).order_by(Race.race_date)
@@ -210,6 +247,58 @@ class DBOperations:
         return session.execute(query).scalars().first()
 
     @_with_engine
+    def _retrieve_predicted_drivers(
+        self,
+        session: Session,
+        username: str,
+        race_name: str,
+        race_format: RaceFormat,
+    ) -> list[str]:
+        query = (select(Driver.name)
+                 .join(Prediction)
+                 .join(User)
+                 .join(Race)
+                 .where(User.username == username,
+                        Race.name == race_name,
+                        Race.race_format == race_format)
+                 .order_by(Prediction.position))  # fmt: skip
+
+        return list(session.execute(query).scalars().all())
+
+    @_with_engine
+    def _retrieve_point_scorers(self, session: Session, race_name: str, race_format: RaceFormat) -> list[str]:
+        query = (select(Driver.name)
+                 .join(Result)
+                 .join(Race)
+                 .where(Race.name == race_name,
+                        Race.race_format == race_format,
+                        Result.points > 0.0)
+                 .order_by(Result.position))  # fmt: skip
+
+        return list(session.execute(query).scalars().all())
+
+    @_with_engine
+    def _retrieve_predictions(self, session: Session, race_name: str, race_format: RaceFormat) -> dict[str, list[str]]:
+        query = (select(User.username, Driver.name)
+                 .join(Prediction, Prediction.user_id == User.id)
+                 .join(Driver)
+                 .join(Race)
+                 .where(Race.name == race_name,
+                        Race.race_format == race_format)
+                 .order_by(User.username, Prediction.position))  # fmt: skip
+
+        result_rows = session.execute(query).all()
+        result = defaultdict(list)
+        for row in result_rows:
+            result[row.username].append(row.name)
+
+        return dict(result)
+
+    @_with_engine
     def _retrieve_user(self, session: Session, username: str) -> User | None:
         query = select(User).where(User.username == username)
         return session.execute(query).scalars().first()
+
+    @_with_engine
+    def _retrieve_users(self, session: Session) -> list[User]:
+        return list(session.execute(select(User)).scalars().all())
