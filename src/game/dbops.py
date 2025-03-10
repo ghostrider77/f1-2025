@@ -151,6 +151,27 @@ class DBOperations:
             error_msg = "Failed to add predictions, maybe already predicted this race."
             return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
 
+    def authenticate(self, username: str, password: str) -> bool:
+        if (user_entity := self._retrieve_user(username)) is None:
+            return False
+
+        return is_password_valid(password, stored_password=user_entity.password)
+
+    @_with_engine
+    def delete_prediction(self, session: Session, username: str, race_name: str, race_format: RaceFormat) -> None:
+        query = (select(Prediction)
+                 .join(User)
+                 .join(Race)
+                 .where(User.username == username,
+                        Race.name == race_name,
+                        Race.race_format == race_format))  # fmt: skip
+
+        predictions = session.execute(query).scalars().all()
+        for prediction in predictions:
+            session.delete(prediction)
+
+        session.commit()
+
     @_with_engine
     def add_result(self, session: Session, result: ResultModel) -> RequestResponse:
         if (race_entity := self._retrieve_race(result.race_name, result.race_format)) is None:
