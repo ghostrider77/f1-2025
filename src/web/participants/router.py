@@ -1,8 +1,17 @@
 from fastapi import APIRouter
 
-from .models import DriverModel, PredictionInfoModel, PredictionModel, RaceModel, ResultModel, ScoreModel
+from .models import (
+    DeletePredictionModel,
+    DriverModel,
+    PredictionInfoModel,
+    PredictionModel,
+    RaceModel,
+    ResultModel,
+    ScoreModel,
+)
 from .. import RequestResponse
 from ...dependencies import DBDependency
+from ...utils.enums import RequestStatus
 
 router = APIRouter(prefix="/api/v1/participants", tags=["actors"])
 
@@ -60,3 +69,13 @@ def get_standings(db: DBDependency) -> list[tuple[str, float]]:
 @router.post("/make/prediction", response_model_exclude_none=True)
 def make_prediction(prediction: PredictionModel, db: DBDependency) -> RequestResponse:
     return db.make_prediction(prediction)
+
+
+@router.delete("/delete/prediction", response_model_exclude_none=True)
+def delete_prediction(request: DeletePredictionModel, db: DBDependency) -> RequestResponse:
+    if not db.authenticate(request.username, request.password):
+        error_msg = f"Failed to authenticate User(username={request.username})."
+        return RequestResponse(status=RequestStatus.FAILURE, message=error_msg)
+
+    db.delete_prediction(request.username, request.race_name, request.race_format)
+    return RequestResponse(status=RequestStatus.SUCCESS)
