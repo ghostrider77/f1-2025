@@ -63,9 +63,177 @@
   {
     "name": "Miami Grand Prix",
     "circuit_name": "Miami International Autodrome",
-    "circuit_location": "Miami Gardens",
+    "circuit_location": "Miami Gardens, FL",
     "country": "USA",
     "date": "2025-05-04",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Emilia Romagna Grand Prix",
+    "circuit_name": "Imola Circuit",
+    "circuit_location": "Imola",
+    "country": "Italy",
+    "date": "2025-05-18",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Monaco Grand Prix",
+    "circuit_name": "Circuit de Monaco",
+    "circuit_location": "Monaco",
+    "country": "Monaco",
+    "date": "2025-05-25",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Spanish Grand Prix",
+    "circuit_name": "Circuit de Barcelona-Catalunya",
+    "circuit_location": "Montmeló",
+    "country": "Spain",
+    "date": "2025-06-01",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Canadian Grand Prix",
+    "circuit_name": "Circuit Gilles Villeneuve",
+    "circuit_location": "Montreal",
+    "country": "Canada",
+    "date": "2025-06-15",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Austrian Grand Prix",
+    "circuit_name": "Red Bull Ring",
+    "circuit_location": "Spielberg",
+    "country": "Austria",
+    "date": "2025-06-29",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "British Grand Prix",
+    "circuit_name": "Silverstone Circuit",
+    "circuit_location": "Silverstone",
+    "country": "United Kingdom",
+    "date": "2025-07-06",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Belgian Grand Prix",
+    "circuit_name": "Circuit de Spa-Francorchamps",
+    "circuit_location": "Stavelot",
+    "country": "Belgium",
+    "date": "2025-07-26",
+    "race_format": "SPRINT_RACE"
+  },
+  {
+    "name": "Belgian Grand Prix",
+    "circuit_name": "Circuit de Spa-Francorchamps",
+    "circuit_location": "Stavelot",
+    "country": "Belgium",
+    "date": "2025-07-27",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Hungarian Grand Prix",
+    "circuit_name": "Hungaroring",
+    "circuit_location": "Mogyoród",
+    "country": "Hungary",
+    "date": "2025-08-03",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Dutch Grand Prix",
+    "circuit_name": "Circuit Zandvoort",
+    "circuit_location": "Zandvoort",
+    "country": "Netherlands",
+    "date": "2025-08-31",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Italian Grand Prix",
+    "circuit_name": "Monza Circuit",
+    "circuit_location": "Monza",
+    "country": "Italy",
+    "date": "2025-09-07",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Azerbaijan Grand Prix",
+    "circuit_name": "Baku City Circuit",
+    "circuit_location": "Baku",
+    "country": "Azerbaijan",
+    "date": "2025-09-21",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Singapore Grand Prix",
+    "circuit_name": "Marina Bay Street Circuit",
+    "circuit_location": "Singapore",
+    "country": "Singapore",
+    "date": "2025-10-05",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "United States Grand Prix",
+    "circuit_name": "Circuit of the Americas",
+    "circuit_location": "Austin, TX",
+    "country": "USA",
+    "date": "2025-10-18",
+    "race_format": "SPRINT_RACE"
+  },
+  {
+    "name": "United States Grand Prix",
+    "circuit_name": "Circuit of the Americas",
+    "circuit_location": "Austin, TX",
+    "country": "USA",
+    "date": "2025-10-19",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Mexico City Grand Prix",
+    "circuit_name": "Autódromo Hermanos Rodríguez",
+    "circuit_location": "Mexico City",
+    "country": "Mexico",
+    "date": "2025-10-26",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Sao Paulo Grand Prix",
+    "circuit_name": "Interlagos Circuit",
+    "circuit_location": "Sao Paulo",
+    "country": "Brazil",
+    "date": "2025-11-08",
+    "race_format": "SPRINT_RACE"
+  },
+  {
+    "name": "Las Vegas Grand Prix",
+    "circuit_name": "Las Vegas Strip Circuit",
+    "circuit_location": "Paradise, NV",
+    "country": "USA",
+    "date": "2025-11-23",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Qatar Grand Prix",
+    "circuit_name": "Lusail International Circuit",
+    "circuit_location": "Lusail",
+    "country": "Qatar",
+    "date": "2025-11-29",
+    "race_format": "SPRINT_RACE"
+  },
+  {
+    "name": "Qatar Grand Prix",
+    "circuit_name": "Lusail International Circuit",
+    "circuit_location": "Lusail",
+    "country": "Qatar",
+    "date": "2025-11-30",
+    "race_format": "GRAND_PRIX"
+  },
+  {
+    "name": "Abu Dhabi Grand Prix",
+    "circuit_name": "Yas Marina Circuit",
+    "circuit_location": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "date": "2025-12-07",
     "race_format": "GRAND_PRIX"
   }
 ]
