@@ -194,6 +194,7 @@ class DBOperations:
         )
         try:
             session.add(race_entity)
+            session.add(race_result)
             race_entity.results.append(race_result)
             session.commit()
             return RequestResponse(status=RequestStatus.SUCCESS)
