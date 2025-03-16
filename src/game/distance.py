@@ -15,4 +15,4 @@ def calc_distance(predicted_drivers: list[str], point_scorers: list[str]) -> flo
 
         distance += abs(ix - jy)
 
-    return distance / (n * (n + 1) / 2)
+    return distance / sum(max(k, n - k) for k in range(n))
