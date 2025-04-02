@@ -189,13 +189,12 @@ class DBOperations:
         race_result = Result(
             driver_id=driver_entity.id,
             constructor_id=constructor_entity.id,
+            race_id=race_entity.id,
             position=result.position,
             points=result.points,
         )
         try:
-            session.add(race_entity)
             session.add(race_result)
-            race_entity.results.append(race_result)
             session.commit()
             return RequestResponse(status=RequestStatus.SUCCESS)
 

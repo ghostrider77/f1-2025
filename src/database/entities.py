@@ -61,9 +61,11 @@ class Result(Base):
 
     __table_args__ = (UniqueConstraint("driver_id", "race_id", "position"),)
 
-    driver_id: Mapped[int] = mapped_column(ForeignKey("driver.id"), primary_key=True)
-    constructor_id: Mapped[int] = mapped_column(ForeignKey("constructor.id"), primary_key=True)
-    race_id: Mapped[int] = mapped_column(ForeignKey("race.id"), primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True, unique=True)
+
+    driver_id: Mapped[int] = mapped_column(ForeignKey("driver.id"))
+    constructor_id: Mapped[int] = mapped_column(ForeignKey("constructor.id"))
+    race_id: Mapped[int] = mapped_column(ForeignKey("race.id"))
 
     position: Mapped[int]
     points: Mapped[float]
@@ -77,6 +79,7 @@ class User(Base):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True, unique=True)
+
     username: Mapped[str] = mapped_column(String(64), index=True, unique=True)
     password: Mapped[bytes]
 
@@ -89,6 +92,7 @@ class Prediction(Base):
     __table_args__ = (UniqueConstraint("user_id", "race_id", "driver_id"),)
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True, unique=True)
+
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", onupdate="CASCADE", ondelete="CASCADE"))
     race_id: Mapped[int] = mapped_column(ForeignKey("race.id", onupdate="CASCADE", ondelete="CASCADE"))
     driver_id: Mapped[int] = mapped_column(ForeignKey("driver.id", onupdate="CASCADE", ondelete="CASCADE"))
